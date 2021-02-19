@@ -1,0 +1,73 @@
+package ano.tmdsmartlife.adapter
+
+import android.content.Context
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import android.widget.Toast
+import androidx.core.view.isVisible
+import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import ano.tmdsmartlife.databinding.ItemFeatureIdDeviceBinding
+import ano.tmdsmartlife.model.FeatureDeviceItem
+import ano.tmdsmartlife.utils.OnItemCheckListener
+import ano.tmdsmartlife.viewmodel.VariableViewModel
+
+class ListIdDeviceFeatureAdapter(
+    val context: Context,
+    val featureDeviceItem: List<FeatureDeviceItem>,
+    val selectedFeature: ArrayList<String>,
+    val fragmentActivity: FragmentActivity
+) : RecyclerView.Adapter<ListIdDeviceFeatureAdapter.ListIdDeviceViewHolder>() {
+    class ListIdDeviceViewHolder(val itemBinding: ItemFeatureIdDeviceBinding) :
+        RecyclerView.ViewHolder(itemBinding.root)
+
+    lateinit var viewModel: VariableViewModel
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ListIdDeviceViewHolder {
+        val view =
+            ItemFeatureIdDeviceBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return ListIdDeviceViewHolder(view)
+    }
+
+    override fun onBindViewHolder(holder: ListIdDeviceViewHolder, position: Int) {
+        holder.itemBinding.tvIdDevice.text = featureDeviceItem[position].idDevice
+        holder.itemBinding.rvFeature.apply {
+            setHasFixedSize(true)
+            layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+            isNestedScrollingEnabled = false
+            adapter = ListFeatureAdapter(
+                context,
+                featureDeviceItem[position].listFeature,
+                object : OnItemCheckListener {
+                    override fun onItemCheck(feature: String) {
+                        selectedFeature.add(feature)
+                        viewModel =
+                            ViewModelProvider(fragmentActivity).get(VariableViewModel::class.java)
+                        viewModel.featureItem.value = selectedFeature
+                        Toast.makeText(context, selectedFeature.toString(), Toast.LENGTH_SHORT)
+                            .show()
+                    }
+
+                    override fun onItemUncheck(feature: String) {
+                        selectedFeature.remove(feature)
+                        viewModel =
+                            ViewModelProvider(fragmentActivity).get(VariableViewModel::class.java)
+                        viewModel.featureItem.value = selectedFeature
+                        Toast.makeText(context, selectedFeature.toString(), Toast.LENGTH_SHORT)
+                            .show()
+                    }
+                }
+            )
+        }
+
+        holder.itemBinding.rvFeature.isVisible = featureDeviceItem[position].isExpandable
+        holder.itemView.setOnClickListener {
+            featureDeviceItem[position].isExpandable = !featureDeviceItem[position].isExpandable
+            notifyItemChanged(position)
+        }
+    }
+
+    override fun getItemCount(): Int = featureDeviceItem.size
+}
