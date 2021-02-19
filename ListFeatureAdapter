@@ -1,0 +1,43 @@
+package ano.tmdsmartlife.adapter
+
+import android.content.Context
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
+import ano.tmdsmartlife.databinding.ItemFeatureBinding
+import ano.tmdsmartlife.model.FeatureItem
+
+class ListFeatureAdapter(
+    val context: Context,
+    val item: List<FeatureItem>,
+    private val onItemCheckListener: OnItemCheckListener
+): RecyclerView.Adapter<ListFeatureAdapter.ListFeatureViewHolder>() {
+    class ListFeatureViewHolder(val itemBinding: ItemFeatureBinding): RecyclerView.ViewHolder(itemBinding.root)
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ListFeatureViewHolder {
+        val view = ItemFeatureBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return ListFeatureViewHolder(view)
+    }
+
+    override fun onBindViewHolder(holder: ListFeatureViewHolder, position: Int) {
+        holder.itemBinding.tvFeatureName.text = item[position].featureName
+        holder.itemBinding.checkBox.isChecked = item[position].isChecked
+        holder.itemBinding.checkBox.setOnClickListener {
+            item[position].isChecked = holder.itemBinding.checkBox.isChecked
+        }
+
+        holder.itemView.setOnClickListener {
+            holder.itemBinding.checkBox.isChecked = !holder.itemBinding.checkBox.isChecked
+            item[position].isChecked = holder.itemBinding.checkBox.isChecked
+
+            val currentItem = item[position]
+            if (holder.itemBinding.checkBox.isChecked) {
+                onItemCheckListener.onItemCheck(currentItem.featureName)
+            } else {
+                onItemCheckListener.onItemUncheck(currentItem.featureName)
+            }
+        }
+    }
+
+    override fun getItemCount(): Int = item.size
+}
