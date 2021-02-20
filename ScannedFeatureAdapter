@@ -1,0 +1,51 @@
+package ano.tmdsmartlife.adapter
+
+import android.content.Context
+import android.view.*
+import androidx.core.view.isVisible
+import androidx.fragment.app.FragmentActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import ano.tmdsmartlife.databinding.ItemFeatureTypeBinding
+import ano.tmdsmartlife.model.FeatureType
+
+class ScannedFeatureAdapter(
+    val context: Context,
+    private val scannedFeature: List<FeatureType>,
+    private val selectedFeature: ArrayList<String>,
+    private val fragmentActivity: FragmentActivity
+) : RecyclerView.Adapter<ScannedFeatureAdapter.ScannedFeatureViewHolder>() {
+    class ScannedFeatureViewHolder(val itemBinding: ItemFeatureTypeBinding) :
+        RecyclerView.ViewHolder(itemBinding.root)
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ScannedFeatureViewHolder {
+        val view =
+            ItemFeatureTypeBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return ScannedFeatureViewHolder(view)
+    }
+
+    override fun onBindViewHolder(holder: ScannedFeatureViewHolder, position: Int) {
+        holder.itemBinding.tvFeatureType.text = scannedFeature[position].featureType
+        holder.itemBinding.tvSlot.text = "Slot: ${scannedFeature[position].slot}"
+
+        holder.itemBinding.rvIdDevice.apply {
+            setHasFixedSize(false)
+            layoutManager = LinearLayoutManager(context)
+            adapter = ListIdDeviceFeatureAdapter(
+                context,
+                scannedFeature[position].listDevice,
+                selectedFeature,
+                fragmentActivity
+            )
+            isNestedScrollingEnabled = false
+        }
+
+        holder.itemBinding.rvIdDevice.isVisible = scannedFeature[position].isExpandable
+        holder.itemView.setOnClickListener {
+            scannedFeature[position].isExpandable = !scannedFeature[position].isExpandable
+            notifyItemChanged(position)
+        }
+    }
+
+    override fun getItemCount(): Int = scannedFeature.size
+}
