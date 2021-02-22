@@ -1,0 +1,45 @@
+private fun populateArrayFeature(data: DaftarAlat) {
+        itemTemperature.add(FeatureItem("temp"))
+
+        val listFeature = arrayListOf(
+            FeatureType("Air Conditioner", data.detail.Air_Conditioner.total_slot, deviceAirConditioner),
+            FeatureType("Lighting", data.detail.Lighting.total_slot, deviceLighting),
+            FeatureType("Temperature", data.detail.Temperature.total_slot, deviceTemperature),
+            FeatureType("CCTV", data.detail.CCTV.total_slot, deviceCctv),
+            FeatureType("TV", data.detail.TV.total_slot, deviceTv)
+        )
+
+        val filtered = listFeature.filter {
+            it.slot != 0
+        }
+        featureType.addAll(filtered)
+    }
+
+    private fun iterateData(arrayList: ArrayList<FeatureItem>, name: String): ArrayList<FeatureItem> {
+        arrayList.clear()
+        for( i in 1..4) {
+            val data = if (name == "ac") {
+                FeatureItem("${name}_${i}")
+            } else {
+                FeatureItem("$name$i")
+            }
+            arrayList.add(data)
+        }
+        return arrayList
+    }
+
+    fun idDeviceTypeFrom(uniqueId: String, idDevice: String) {
+        deviceAirConditioner.clear()
+        deviceCctv.clear()
+        deviceLighting.clear()
+        deviceTemperature.clear()
+        deviceTv.clear()
+
+        when(uniqueId.substring(11)) {
+            "ACC" -> deviceAirConditioner.add(FeatureDeviceItem(idDevice, iterateData(itemAirConditioner, "ac")))
+            "TMP" -> deviceTemperature.add(FeatureDeviceItem(idDevice, itemTemperature))
+            "LHT" -> deviceLighting.add(FeatureDeviceItem(idDevice, iterateData(itemLighting, "lampu")))
+            "TTV" -> deviceTv.add(FeatureDeviceItem(idDevice, iterateData(itemTv, "tv")))
+            "CTV" -> deviceCctv.add(FeatureDeviceItem(idDevice, iterateData(itemCctv, "cctv")))
+        }
+    }
