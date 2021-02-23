@@ -1,0 +1,2 @@
+ - Gunakan  by activityViewModel() untuk sharedViewModel / berbagi data menggunakan 1 viewmodel untuk beberapa fragment
+   karena jika menggunakan by viewmodel() data tidak akan keluar dari halaman tersebut
